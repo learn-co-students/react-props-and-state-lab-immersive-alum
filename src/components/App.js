@@ -9,10 +9,40 @@ class App extends React.Component {
 
     this.state = {
       pets: [],
+      adoptedPets: [],
       filters: {
         type: 'all'
       }
     }
+  }
+
+  handleSubmit = () => {
+    let url;
+    if (this.state.filters.type==='all'){
+      url='/api/pets'
+    } else {
+      url='/api/pets?type=' + this.state.filters.type
+    }
+    fetch(url).then(res=>res.json()).then(json=>this.setState({pets:json}))
+  }
+
+  handleFilterChange = (filter) => {
+    this.setState({
+      filters: {
+        type: filter
+      }
+    })
+  }
+
+  handleAdopt = (id) => {
+    let adoptedPets = this.state.adoptedPets
+    this.setState({
+      adoptedPets: [...adoptedPets, id]
+    })
+  }
+
+  componentDidMount(){
+    fetch('/api/pets').then(res=>res.json()).then(json=>this.setState({pets:json}))
   }
 
   render() {
@@ -24,10 +54,10 @@ class App extends React.Component {
         <div className="ui container">
           <div className="ui grid">
             <div className="four wide column">
-              <Filters />
+              <Filters handleSubmit={this.handleSubmit} handleFilterChange={this.handleFilterChange}/>
             </div>
             <div className="twelve wide column">
-              <PetBrowser />
+              <PetBrowser adoptedPets={this.state.adoptedPets} onAdopt={this.handleAdopt} pets={this.state.pets}/>
             </div>
           </div>
         </div>
